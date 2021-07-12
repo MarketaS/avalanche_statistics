@@ -57,8 +57,57 @@ dta$time <- as.POSIXct(x = times, format = "%Y-%m-%d %H:%M")
 dta$DATE2 <- strtrim(x = as.character(dta$date), width = 10)
 dta$DATE2 <- as.POSIXct(paste(dta$DATE2), format = "%Y-%m-%d")
 
+dta[datum > as.Date("2003-10-30") & datum < as.Date("2004-03-06"), CAW:= "cold"]
+dta[datum > as.Date("2004-03-07") & datum < as.Date("2004-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2004-10-30") & datum < as.Date("2005-03-07"), CAW:= "cold"]
+dta[datum > as.Date("2005-03-08") & datum < as.Date("2005-10-30"), CAW:= "warm"]
+dta[datum > as.Date("2005-11-1") & datum < as.Date("2006-03-06"), CAW:= "cold"]
+dta[datum > as.Date("2006-03-07") & datum < as.Date("2006-10-30"), CAW:= "warm"]
+dta[datum > as.Date("2006-11-1") & datum < as.Date("2007-01-30"), CAW:= "cold"]
+dta[datum > as.Date("2007-01-31") & datum < as.Date("2007-10-30"), CAW:= "warm"]
+dta[datum > as.Date("2007-11-1") & datum < as.Date("2008-03-26"), CAW:= "cold"]
+dta[datum > as.Date("2008-03-27") & datum < as.Date("2008-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2008-11-1") & datum < as.Date("2009-03-26"), CAW:= "cold"]
+dta[datum > as.Date("2009-03-27") & datum < as.Date("2009-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2009-11-1") & datum < as.Date("2010-03-11"), CAW:= "cold"]
+dta[datum > as.Date("2010-03-12") & datum < as.Date("2010-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2010-11-1") & datum < as.Date("2011-02-27"), CAW:= "cold"]
+dta[datum > as.Date("2011-02-28") & datum < as.Date("2011-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2011-11-1") & datum < as.Date("2012-02-10"), CAW:= "cold"]
+dta[datum > as.Date("2012-02-11") & datum < as.Date("2012-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2012-11-1") & datum < as.Date("2013-03-31"), CAW:= "cold"]
+dta[datum > as.Date("2013-04-01") & datum < as.Date("2013-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2013-11-1") & datum < as.Date("2014-01-30"), CAW:= "cold"]
+dta[datum > as.Date("2014-01-31") & datum < as.Date("2014-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2014-11-1") & datum < as.Date("2015-02-08"), CAW:= "cold"]
+dta[datum > as.Date("2015-02-09") & datum < as.Date("2015-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2015-11-1") & datum < as.Date("2016-01-23"), CAW:= "cold"]
+dta[datum > as.Date("2016-01-24") & datum < as.Date("2016-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2016-11-1") & datum < as.Date("2017-01-11"), CAW:= "cold"]
+dta[datum > as.Date("2017-01-12") & datum < as.Date("2017-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2017-11-1") & datum < as.Date("2018-03-03"), CAW:= "cold"]
+dta[datum > as.Date("2018-03-04") & datum < as.Date("2018-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2018-11-1") & datum < as.Date("2019-01-26"), CAW:= "cold"]
+dta[datum > as.Date("2019-01-27") & datum < as.Date("2019-10-30"), CAW:= "warm"]
+
+dta[datum > as.Date("2019-11-1") & datum < as.Date("2020-03-30"), CAW:= "cold"]
+dta[datum > as.Date("2020-03-31") & datum < as.Date("2020-10-30"), CAW:= "warm"]
+
 dta$date <- dta$datum <-dta$time <- NULL
-dta_melt <- melt(dta, id.vars = "DATE2")
+#dta_melt <- melt(dta, id.vars = "DATE2")
+dta_melt <- melt(dta, id.vars = c("DATE2", "CAW"))
 
 hours <-  c(24,48,72,96,120,144)
 for (i in c(1:length(hours))){
@@ -73,8 +122,10 @@ for (i in c(1:length(hours))){
   gc()
   print(hours[i])
 }
-saveRDS(object = dta_melt, file = "data/dta_melt.rds")
-dta_melt <- readRDS(file = "data/dta_melt.rds")
+#saveRDS(object = dta_melt, file = "data/dta_melt.rds")
+#dta_melt <- readRDS(file = "data/dta_melt.rds")
+saveRDS(object = dta_melt, file = "data/dta_melt_CAW.rds")
+dta_melt <- readRDS(file = "data/dta_melt_CAW.rds")
 
 Aval$DATE2 <- strtrim(x = Aval$date, width = 10)
 
@@ -102,11 +153,14 @@ aval_dtafr <- merge(x = aval_dtafr, y = Aval_short[,.(event,ID)], by = "ID")
 saveRDS(object = aval_dtafr, file = "data/aval_dtafr.rds")
 aval_dtafr <- readRDS(file = "data/aval_dtafr.rds")
 
-colnames(aval_dtafr) <- c(colnames(aval_dtafr)[1:2], "var", colnames(aval_dtafr)[4:length(colnames(aval_dtafr))])
-aval_melt <- melt(data = aval_dtafr, id.vars = c("ID", "DATE2", "PLOT", "event", "var"))
+colnames(aval_dtafr) <- c(colnames(aval_dtafr)[1:3], "var", colnames(aval_dtafr)[5:length(colnames(aval_dtafr))])
+#colnames(aval_dtafr) <- c(colnames(aval_dtafr)[1:2], "var", colnames(aval_dtafr)[4:length(colnames(aval_dtafr))])
+#aval_melt <- melt(data = aval_dtafr, id.vars = c("ID", "DATE2", "PLOT", "event", "var"))
+aval_melt <- melt(data = aval_dtafr, id.vars = c("ID", "DATE2", "PLOT", "event", "var", "CAW"))
 aval_melt[, var_name:= paste0(var, "_", variable)]
-
-aval_dcast <- dcast.data.table(aval_melt, DATE2 + ID + PLOT + event ~ var_name, value.var = 'value')
+adcast <- dcast.data.table(aval_melt, DATE2 + ID + PLOT + event + CAW  ~ var_name, value.var = 'value')
+#aval_dcast <- dcast.data.table(aval_melt, DATE2 + ID + PLOT + event ~ var_name, value.var = 'value')
+saveRDS(object = adcast, file = "data/adcast.rds")
 
 #aval_melt$var <- aval_melt$variable <- NULL
 library(dplyr)
@@ -274,135 +328,8 @@ library(ggplot2)
   #geom_boxplot(outlier.colour="red", outlier.shape=8,
   #outlier.size=4)
 
-#load("my_work_space.RData")
-
-setwd("home/marketa/R/Krkonose/LBOU")
-LBOU_daily = fread('LBOU_daily_1961_2020.txt', sep = "\t", data.table = T)
-LBOU_daily$Date2 <- as.Date(LBOU_daily$date, format = "%d.%m.%Y")
-class(LBOU_daily)                              
-#LBOU_daily <- data.table(read_delim("C:/Users/marketa.souckova/Documents/laviny/LBOU/LBOU_daily_1961_2020.txt", 
-# "\t", escape_double = FALSE, col_types = cols(Dprum = col_double(), 
-# Fmax = col_double(), Fprum = col_double(), 
-#Hprum = col_double(), RGLB1H = col_double(), 
-#SCE = col_double(), SNO = col_double(), 
-#SRA = col_double(), SSV = col_double(), 
-#SVH = col_double(), Tprum = col_double(), 
-#T05prum = col_double(), date = col_character(), 
-#trim_ws = TRUE)) 
 
 
 
-#rbind (Aval_short, dta, fill = TRUE)
-Aval_short$Date_new <- as.Date(Aval_short$DATE2, format = "%d.%m.%Y")
-AVmeteo_2004_2020 <- merge(x = Aval_short[,.(Date_new, AV_count)], y = LBOU_daily, by.x = "Date_new", by.y = "Date2")
-#Vmeteo_2004_2020 <- merge(x = Aval_short[,.(Date_new, AV_count)], y = LBOU_daily, by = .(year(Date2), month(Date2)))# AGREGOVANE mesice?
-AVmeteo_2004_2020[,YEAR:= year(Date_new)]
-c(10,11, 12, 1, 2, 3, 4, 5)
-AVmeteo_2004_2020[,MONTH:=month(Date_new)]
-AVmeteo_2004_2020[MONTH %in% c(10,11, 12, 1, 2, 3, 4, 5)]
-AVmeteo_2004_2020[month(Date_new) %in% c(10,11, 12, 1, 2, 3, 4, 5)]
-AVmeteo_WINTER<- AVmeteo_2004_2020[MONTH %in% c(10,11, 12, 1, 2, 3, 4, 5)]
-
-#Vmeteo_2004_2020[month(Date_new) %in% c(10,11, 12, 1, 2, 3, 4, 5), WINTER:= TRUE]
-#Vmeteo_2004_2020[,aa:= lag(WINTER)]
-
-coeff = 0.1 
-(p2<-ggplot(data = AVmeteo_2004_2020[year(Date_new)==2004]) +
-  geom_line(aes(x = Date_new, y=Tprum, colour ="Tavg", group = MONTH))+
-  geom_bar(x = Date_new, y=AV_count/coeff, group = MONTH))+ # Divide by 10 to get the same range than the temperature
-    facet_wrap(~YEAR, scales = "free_y")+
   
-  scale_y_continuous(
-    
-    # Features of the first axis
-    name = "Tavg",
-    
-    # Add a second axis and specify its features
-    sec.axis = sec_axis(~.*coeff, name="Aval count")
-  ))
-#TRYING TO DISPLAY JUST WINTER SEASON, Av count by mel brat jen 1. výskyt datumu 2004/2005 je 77 lavin za zimu
-(p2<-ggplot(data = AVmeteo_WINTER[year(Date_new==2004]) +
-    geom_line(aes(x = Date_new, y=Tprum, colour ="Tavg", group = YEAR))+
-    geom_line(aes(x = Date_new, y=AV_count/coeff, group = YEAR))+
-    facet_wrap(~YEAR, scales = "free_y")+
-    
-    scale_y_continuous(
-      
-      # Features of the first axis
-      name = "Tavg",
-      
-      # Add a second axis and specify its features
-      sec.axis = sec_axis(~.*coeff, name="Aval count")
-    ))
-
-# correlation of the avalanche data
-  A_lenght_crown <- ggplot(data = Aval, aes(y = L, x = N)) + 
-    geom_point()+
-    geom_smooth(method = "glm", se = FALSE)+
-    xlab ("Avalanche slide distance [m]") + ylab ("Crown width [m]")
-
-  
-  
-  #day1 <- aval_melt_ID[PLOT %between% c(120-24,120), ifelse(test = variable %in% c("H", "SCE", "SVH", "T", "Fprum", "Fmax", "T05", "D"), 
-  #                                                     yes = ifelse(test = variable == "Fmax",
-  #                                                                 yes = max(value, na.rm = T), 
-  #                                                                no = mean(value, na.rm = T)), 
-  #                                                  no = sum(value, na.rm = T)), by = .(ID, variable, event)]
-  #day1[V1 == -Inf, unique(variable)]
-  #day1[V1 == -Inf, V1:= NA]
-  
-  #day1_mean <- day1[,mean(V1, na.rm = T), by = .(variable, event)]
-  
-  #colnames(day1_mean) <- c("variable", "event", "24h")    
-  
-  #day2 <- aval_melt_ID[PLOT %between% c(120-(24*2),120), ifelse(test = variable %in% c("H", "SCE", "SVH", "T", "Fprum", "Fmax", "T05", "D"), 
-  #          yes = ifelse(test = variable == "Fmax",
-  #                      yes = max(value, na.rm = T), 
-  #                     no = mean(value, na.rm = T)), 
-  #       no = sum(value, na.rm = T)), by = .(ID, variable, event)]
-  
-  #day2[V1 == -Inf, unique(variable)]
-  #day2[V1 == -Inf, V1:= NA]
-  
-  #day2_mean <- day2[,mean(V1, na.rm = T), by = .(variable, event)]
-  
-  #colnames(day2_mean) <- c("variable", "event", "48h") 
-  
-  #variables_48<-full_join(x = day1_mean, y = day2_mean, by = c("variable", "event"))
-  
-  #day3 <- aval_melt_ID[PLOT %between% c(120-(24*3),120), ifelse(test = variable %in% c("H", "SCE", "SVH", "T", "Fprum", "Fmax", "T05", "D"), 
-  #                      yes = ifelse(test = variable == "Fmax",
-  #                                  yes = max(value, na.rm = T), 
-  #                                 no = mean(value, na.rm = T)), 
-  #                   no = sum(value, na.rm = T)), by = .(ID, variable, event)]
-  
-  #day3_mean <- day3[,mean(V1, na.rm = T), by = .(variable, event)]
-  
-  #colnames(day3_mean) <- c("variable", "event", "72h") 
-  #variables_72<-full_join(x = variables_48, y = day3_mean, by = c("variable", "event"))
-  
-  #day4 <- aval_melt_ID[PLOT %between% c(120-(24*4),120), ifelse(test = variable %in% c("H", "SCE", "SVH", "T", "Fprum", "Fmax", "T05", "D"), 
-  #                  yes = ifelse(test = variable == "Fmax",
-  #                              yes = max(value, na.rm = T), 
-  #                             no = mean(value, na.rm = T)), 
-  #               no = sum(value, na.rm = T)), by = .(ID, variable, event)]
-  
-  #day4_mean <- day4[,mean(V1, na.rm = T), by = .(variable, event)]
-  
-  #colnames(day4_mean) <- c("variable", "event", "96h") 
-  #variables_96<-full_join(x = variables_72, y = day4_mean, by = c("variable", "event"))
-  
-  #day5 <- aval_melt_ID[PLOT %between% c(120-(24*5),120), ifelse(test = variable %in% c("H", "SCE", "SVH", "T", "Fprum", "Fmax", "T05", "D"), 
-  ##                          yes = max(value, na.rm = T), 
-  #                         no = mean(value, na.rm = T)), 
-  #           no = sum(value, na.rm = T)), by = .(ID, variable, event)]
-  #
-  #day5_mean <- day5[,mean(V1, na.rm = T), by = .(variable, event)]
-  
-  #colnames(day5_mean) <- c("variable", "event", "120h") 
-  #variables_120<-full_join(x = variables_96, y = day5_mean, by = c("variable", "event"))
-  
-  #saveRDS(variables_120, file = "my_data.rds")
-  #save.image(file = "cumulative_variables.RData")
-  #load("cumulative_variables.RData")
   
